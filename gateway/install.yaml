@@ -1,0 +1,102 @@
+# 시스템 도구 (OS 패키지 매니저로 설치)
+system_tools:
+  - name: libreoffice
+    description: "Office 문서 렌더링, 변환, 매크로 실행"
+    check: "soffice --version"
+    required: true
+    install:
+      windows: "choco install libreoffice-fresh -y"
+      macos: "brew install --cask libreoffice"
+      linux_apt: "sudo apt install -y libreoffice"
+      linux_dnf: "sudo dnf install -y libreoffice"
+
+  - name: pandoc
+    description: "DOCX 읽기/변환"
+    check: "pandoc --version"
+    required: true
+    install:
+      windows: "choco install pandoc -y"
+      macos: "brew install pandoc"
+      linux_apt: "sudo apt install -y pandoc"
+      linux_dnf: "sudo dnf install -y pandoc"
+
+  - name: poppler-utils
+    description: "PDF → 이미지 변환 (pdftoppm)"
+    check: "pdftoppm -v"
+    required: false
+    install:
+      windows: "choco install poppler -y"
+      macos: "brew install poppler"
+      linux_apt: "sudo apt install -y poppler-utils"
+      linux_dnf: "sudo dnf install -y poppler-utils"
+
+  - name: qpdf
+    description: "PDF 병합/분할"
+    check: "qpdf --version"
+    required: false
+    install:
+      windows: "choco install qpdf -y"
+      macos: "brew install qpdf"
+      linux_apt: "sudo apt install -y qpdf"
+      linux_dnf: "sudo dnf install -y qpdf"
+
+# Python 패키지
+python_packages:
+  - name: office-python-deps
+    description: "Office 문서 처리 Python 패키지"
+    install: "pip install lxml defusedxml"
+    check: "python -c \"import lxml; import defusedxml\""
+    required: true
+
+  - name: pdf-python-deps
+    description: "PDF 처리 Python 패키지"
+    install: "pip install pypdf pdfplumber reportlab pypdfium2 Pillow"
+    check: "python -c \"import pypdf; import pdfplumber; import reportlab\""
+    required: true
+
+  - name: xlsx-python-deps
+    description: "Excel 처리 Python 패키지"
+    install: "pip install openpyxl pandas"
+    check: "python -c \"import openpyxl; import pandas\""
+    required: true
+
+# npm 패키지
+npm_packages:
+  - name: docx-npm-deps
+    description: "DOCX 신규 생성 (docx-js)"
+    install: "npm install docx"
+    check: "node -e \"require('docx')\""
+    required: true
+
+  - name: pptx-npm-deps
+    description: "PPTX 신규 생성 (PptxGenJS)"
+    install: "npm install pptxgenjs react-icons sharp"
+    check: "node -e \"require('pptxgenjs')\""
+    required: true
+
+# 커스텀 도구
+custom_tools:
+  - name: office-module
+    description: "공유 Office 모듈 (unpack/pack/validate/soffice)"
+    source: tools/office/
+    required: true
+
+  - name: docx-tools
+    description: "DOCX 전용 도구 (accept_changes, comment)"
+    source: tools/docx/
+    required: true
+
+  - name: pptx-tools
+    description: "PPTX 전용 도구 (add_slide, clean, thumbnail)"
+    source: tools/pptx/
+    required: true
+
+  - name: xlsx-tools
+    description: "XLSX 전용 도구 (recalc)"
+    source: tools/xlsx/
+    required: true
+
+  - name: pdf-tools
+    description: "PDF 전용 도구 (8개 스크립트)"
+    source: tools/pdf/
+    required: true

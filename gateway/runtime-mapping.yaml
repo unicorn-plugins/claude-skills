@@ -1,0 +1,110 @@
+# ─────────────────────────────────────────────
+# 티어 매핑
+# ─────────────────────────────────────────────
+tier_mapping:
+  default:
+    HEAVY:
+      model: "claude-opus-4-6"
+    HIGH:
+      model: "claude-opus-4-6"
+    MEDIUM:
+      model: "claude-sonnet-4-5"
+    LOW:
+      model: "claude-haiku-4-5"
+
+# ─────────────────────────────────────────────
+# 도구 매핑 (builtin 제외 — custom만)
+# ─────────────────────────────────────────────
+tool_mapping:
+  # Office 공유 모듈
+  office_unpack:
+    - type: custom
+      source: "tools/office/unpack.py"
+      tools: ["office_unpack"]
+  office_pack:
+    - type: custom
+      source: "tools/office/pack.py"
+      tools: ["office_pack"]
+  office_validate:
+    - type: custom
+      source: "tools/office/validate.py"
+      tools: ["office_validate"]
+  office_soffice:
+    - type: custom
+      source: "tools/office/soffice.py"
+      tools: ["office_soffice"]
+
+  # DOCX 전용
+  docx_accept_changes:
+    - type: custom
+      source: "tools/docx/accept_changes.py"
+      tools: ["docx_accept_changes"]
+  docx_comment:
+    - type: custom
+      source: "tools/docx/comment.py"
+      tools: ["docx_comment"]
+
+  # PPTX 전용
+  pptx_add_slide:
+    - type: custom
+      source: "tools/pptx/add_slide.py"
+      tools: ["pptx_add_slide"]
+  pptx_clean:
+    - type: custom
+      source: "tools/pptx/clean.py"
+      tools: ["pptx_clean"]
+  pptx_thumbnail:
+    - type: custom
+      source: "tools/pptx/thumbnail.py"
+      tools: ["pptx_thumbnail"]
+
+  # XLSX 전용
+  xlsx_recalc:
+    - type: custom
+      source: "tools/xlsx/recalc.py"
+      tools: ["xlsx_recalc"]
+
+  # PDF 전용
+  pdf_check_fillable:
+    - type: custom
+      source: "tools/pdf/check_fillable_fields.py"
+      tools: ["pdf_check_fillable"]
+  pdf_extract_field_info:
+    - type: custom
+      source: "tools/pdf/extract_form_field_info.py"
+      tools: ["pdf_extract_field_info"]
+  pdf_extract_structure:
+    - type: custom
+      source: "tools/pdf/extract_form_structure.py"
+      tools: ["pdf_extract_structure"]
+  pdf_fill_fields:
+    - type: custom
+      source: "tools/pdf/fill_fillable_fields.py"
+      tools: ["pdf_fill_fields"]
+  pdf_fill_annotations:
+    - type: custom
+      source: "tools/pdf/fill_pdf_form_with_annotations.py"
+      tools: ["pdf_fill_annotations"]
+  pdf_check_boxes:
+    - type: custom
+      source: "tools/pdf/check_bounding_boxes.py"
+      tools: ["pdf_check_boxes"]
+  pdf_to_images:
+    - type: custom
+      source: "tools/pdf/convert_pdf_to_images.py"
+      tools: ["pdf_to_images"]
+  pdf_validation_image:
+    - type: custom
+      source: "tools/pdf/create_validation_image.py"
+      tools: ["pdf_validation_image"]
+
+# ─────────────────────────────────────────────
+# 액션 매핑
+# ─────────────────────────────────────────────
+action_mapping:
+  file_write: ["Write", "Edit"]
+  file_delete: ["Bash"]
+  code_execute: ["Bash"]
+  network_access: ["WebFetch", "WebSearch"]
+  user_interact: ["AskUserQuestion"]
+  agent_delegate: ["Task"]

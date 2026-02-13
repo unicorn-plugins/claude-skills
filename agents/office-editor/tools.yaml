@@ -1,0 +1,74 @@
+# ─────────────────────────────────────────────
+# office-editor 에이전트 필요 도구 인터페이스
+# 런타임이 Gateway의 runtime-mapping.yaml을 참조하여 실제 도구에 매핑
+# ─────────────────────────────────────────────
+tools:
+  # ─── Builtin 도구 (Claude Code 기본 제공) ───
+  - name: file_read
+    description: "파일 내용 읽기"
+    input: { 파일경로 }
+    output: { 파일내용 }
+
+  - name: file_write
+    description: "파일 생성/수정"
+    input: { 파일경로, 내용 }
+    output: { 성공여부 }
+
+  - name: code_execute
+    description: "스크립트 실행 (Python, npm)"
+    input: { 명령, 인자 }
+    output: { 실행결과, 표준출력, 표준에러 }
+
+  # ─── Office 공유 모듈 (커스텀) ───
+  - name: office_unpack
+    description: "Office 문서 ZIP 해제 + XML 정리"
+    input: { 입력파일경로, 출력디렉토리 }
+    output: { 해제된XML디렉토리 }
+
+  - name: office_pack
+    description: "XML 유효성 검증 + ZIP 패키징"
+    input: { 입력디렉토리, 출력파일경로 }
+    output: { 생성된파일경로 }
+
+  - name: office_validate
+    description: "XSD 스키마 기반 XML 검증"
+    input: { XML파일경로 }
+    output: { 검증결과, 에러목록 }
+
+  - name: office_soffice
+    description: "LibreOffice 실행기 (문서 열기 가능 여부 테스트)"
+    input: { 파일경로 }
+    output: { 실행결과 }
+
+  # ─── DOCX 전용 (커스텀) ───
+  - name: docx_accept_changes
+    description: "변경 추적 수락"
+    input: { 입력파일, 출력파일 }
+    output: { 처리된파일경로 }
+
+  - name: docx_comment
+    description: "DOCX 코멘트 추가"
+    input: { 입력파일, 출력파일, 코멘트내용 }
+    output: { 처리된파일경로 }
+
+  # ─── PPTX 전용 (커스텀) ───
+  - name: pptx_add_slide
+    description: "슬라이드 복제/추가"
+    input: { 입력파일, 출력파일, 슬라이드번호 }
+    output: { 처리된파일경로 }
+
+  - name: pptx_clean
+    description: "고아 리소스 정리"
+    input: { 입력파일, 출력파일 }
+    output: { 처리된파일경로, 정리항목목록 }
+
+  - name: pptx_thumbnail
+    description: "슬라이드 썸네일 생성"
+    input: { 입력파일, 출력디렉토리 }
+    output: { 썸네일이미지목록 }
+
+  # ─── XLSX 전용 (커스텀) ───
+  - name: xlsx_recalc
+    description: "Excel 수식 재계산"
+    input: { 입력파일, 출력파일 }
+    output: { 처리된파일경로 }

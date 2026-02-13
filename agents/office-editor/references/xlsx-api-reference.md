@@ -1,0 +1,236 @@
+# XLSX API Reference
+
+## Overview
+
+Tools and workflows for creating, editing, and analyzing Excel spreadsheets (.xlsx files).
+
+## Quick Reference
+
+| Task | Best Tool | Notes |
+|------|-----------|-------|
+| Data analysis, bulk operations | pandas | Powerful data manipulation |
+| Complex formatting, formulas | openpyxl | Excel-specific features |
+| Formula recalculation | LibreOffice (scripts/recalc.py) | Required after formula changes |
+
+---
+
+## Reading and Analyzing Data with pandas
+
+```python
+import pandas as pd
+
+# Read Excel
+df = pd.read_excel('file.xlsx')  # Default: first sheet
+all_sheets = pd.read_excel('file.xlsx', sheet_name=None)  # All sheets as dict
+
+# Analyze
+df.head()      # Preview data
+df.info()      # Column info
+df.describe()  # Statistics
+
+# Write Excel
+df.to_excel('output.xlsx', index=False)
+```
+
+### pandas Best Practices
+
+- Specify data types to avoid inference issues: `pd.read_excel('file.xlsx', dtype={'id': str})`
+- For large files, read specific columns: `pd.read_excel('file.xlsx', usecols=['A', 'C', 'E'])`
+- Handle dates properly: `pd.read_excel('file.xlsx', parse_dates=['date_column'])`
+
+---
+
+## Creating New Excel Files with openpyxl
+
+```python
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
+
+wb = Workbook()
+sheet = wb.active
+
+# Add data
+sheet['A1'] = 'Hello'
+sheet['B1'] = 'World'
+sheet.append(['Row', 'of', 'data'])
+
+# Add formula
+sheet['B2'] = '=SUM(A1:A10)'
+
+# Formatting
+sheet['A1'].font = Font(bold=True, color='FF0000')
+sheet['A1'].fill = PatternFill('solid', start_color='FFFF00')
+sheet['A1'].alignment = Alignment(horizontal='center')
+
+# Column width
+sheet.column_dimensions['A'].width = 20
+
+wb.save('output.xlsx')
+```
+
+---
+
+## Editing Existing Excel Files with openpyxl
+
+```python
+from openpyxl import load_workbook
+
+# Load existing file
+wb = load_workbook('existing.xlsx')
+sheet = wb.active  # or wb['SheetName'] for specific sheet
+
+# Working with multiple sheets
+for sheet_name in wb.sheetnames:
+    sheet = wb[sheet_name]
+    print(f"Sheet: {sheet_name}")
+
+# Modify cells
+sheet['A1'] = 'New Value'
+sheet.insert_rows(2)  # Insert row at position 2
+sheet.delete_cols(3)  # Delete column 3
+
+# Add new sheet
+new_sheet = wb.create_sheet('NewSheet')
+new_sheet['A1'] = 'Data'
+
+wb.save('modified.xlsx')
+```
+
+### openpyxl Best Practices
+
+- Cell indices are 1-based (row=1, column=1 refers to cell A1)
+- Use `data_only=True` to read calculated values: `load_workbook('file.xlsx', data_only=True)`
+- **Warning**: If opened with `data_only=True` and saved, formulas are replaced with values and permanently lost
+- For large files: Use `read_only=True` for reading or `write_only=True` for writing
+- Formulas are preserved but not evaluated - use scripts/recalc.py to update values
+
+---
+
+## CRITICAL: Use Formulas, Not Hardcoded Values
+
+**Always use Excel formulas instead of calculating values in Python and hardcoding them.** This ensures the spreadsheet remains dynamic and updateable.
+
+### WRONG - Hardcoding Calculated Values
+```python
+# Bad: Calculating in Python and hardcoding result
+total = df['Sales'].sum()
+sheet['B10'] = total  # Hardcodes 5000
+
+# Bad: Computing growth rate in Python
+growth = (df.iloc[-1]['Revenue'] - df.iloc[0]['Revenue']) / df.iloc[0]['Revenue']
+sheet['C5'] = growth  # Hardcodes 0.15
+
+# Bad: Python calculation for average
+avg = sum(values) / len(values)
+sheet['D20'] = avg  # Hardcodes 42.5
+```
+
+### CORRECT - Using Excel Formulas
+```python
+# Good: Let Excel calculate the sum
+sheet['B10'] = '=SUM(B2:B9)'
+
+# Good: Growth rate as Excel formula
+sheet['C5'] = '=(C4-C2)/C2'
+
+# Good: Average using Excel function
+sheet['D20'] = '=AVERAGE(D2:D19)'
+```
+
+This applies to ALL calculations - totals, percentages, ratios, differences, etc. The spreadsheet should be able to recalculate when source data changes.
+
+---
+
+## Recalculating Formulas
+
+Excel files created or modified by openpyxl contain formulas as strings but not calculated values. Use the provided `scripts/recalc.py` script to recalculate formulas:
+
+```bash
+python scripts/recalc.py <excel_file> [timeout_seconds]
+```
+
+Example:
+```bash
+python scripts/recalc.py output.xlsx 30
+```
+
+The script:
+- Automatically sets up LibreOffice macro on first run
+- Recalculates all formulas in all sheets
+- Scans ALL cells for Excel errors (#REF!, #DIV/0!, etc.)
+- Returns JSON with detailed error locations and counts
+- Works on both Linux and macOS
+
+### Interpreting recalc.py Output
+
+```json
+{
+  "status": "success",           // or "errors_found"
+  "total_errors": 0,              // Total error count
+  "total_formulas": 42,           // Number of formulas in file
+  "error_summary": {              // Only present if errors found
+    "#REF!": {
+      "count": 2,
+      "locations": ["Sheet1!B5", "Sheet1!C10"]
+    }
+  }
+}
+```
+
+---
+
+## Common Workflow
+
+1. **Choose tool**: pandas for data, openpyxl for formulas/formatting
+2. **Create/Load**: Create new workbook or load existing file
+3. **Modify**: Add/edit data, formulas, and formatting
+4. **Save**: Write to file
+5. **Recalculate formulas (MANDATORY IF USING FORMULAS)**: `python scripts/recalc.py output.xlsx`
+6. **Verify and fix any errors**:
+   - The script returns JSON with error details
+   - If `status` is `errors_found`, check `error_summary` for specific error types and locations
+   - Fix the identified errors and recalculate again
+   - Common errors to fix:
+     - `#REF!`: Invalid cell references
+     - `#DIV/0!`: Division by zero
+     - `#VALUE!`: Wrong data type in formula
+     - `#NAME?`: Unrecognized formula name
+
+---
+
+## Formula Verification Checklist
+
+Quick checks to ensure formulas work correctly:
+
+### Essential Verification
+- Test 2-3 sample references: Verify they pull correct values before building full model
+- Column mapping: Confirm Excel columns match (e.g., column 64 = BL, not BK)
+- Row offset: Remember Excel rows are 1-indexed (DataFrame row 5 = Excel row 6)
+
+### Common Pitfalls
+- NaN handling: Check for null values with `pd.notna()`
+- Far-right columns: FY data often in columns 50+
+- Multiple matches: Search all occurrences, not just first
+- Division by zero: Check denominators before using `/` in formulas (#DIV/0!)
+- Wrong references: Verify all cell references point to intended cells (#REF!)
+- Cross-sheet references: Use correct format (Sheet1!A1) for linking sheets
+
+### Formula Testing Strategy
+- Start small: Test formulas on 2-3 cells before applying broadly
+- Verify dependencies: Check all cells referenced in formulas exist
+- Test edge cases: Include zero, negative, and very large values
+
+---
+
+## Requirements for All Excel Files
+
+### Professional Font
+- Use a consistent, professional font (e.g., Arial, Times New Roman) for all deliverables unless otherwise instructed
+
+### Zero Formula Errors
+- Every Excel model MUST be delivered with ZERO formula errors (#REF!, #DIV/0!, #VALUE!, #N/A, #NAME?)
+
+### Preserve Existing Templates
+- Study and EXACTLY match existing format, style, and conventions when modifying files
+- Never impose standardized formatting on files with established patterns
+- Existing template conventions ALWAYS override guidelines

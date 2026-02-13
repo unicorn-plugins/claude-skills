@@ -1,0 +1,61 @@
+# ─────────────────────────────────────────────
+# pdf-handler 에이전트 필요 도구 인터페이스
+# 런타임이 Gateway의 runtime-mapping.yaml을 참조하여 실제 도구에 매핑
+# ─────────────────────────────────────────────
+tools:
+  # ─── Builtin 도구 (Claude Code 기본 제공) ───
+  - name: file_read
+    description: "파일 내용 읽기"
+    input: { 파일경로 }
+    output: { 파일내용 }
+
+  - name: file_write
+    description: "파일 생성/수정"
+    input: { 파일경로, 내용 }
+    output: { 성공여부 }
+
+  - name: code_execute
+    description: "스크립트 실행 (Python)"
+    input: { 명령, 인자 }
+    output: { 실행결과, 표준출력, 표준에러 }
+
+  # ─── PDF 전용 (커스텀) ───
+  - name: pdf_check_fillable
+    description: "채울 수 있는 필드 확인"
+    input: { PDF파일경로 }
+    output: { 필드존재여부, 필드목록 }
+
+  - name: pdf_extract_field_info
+    description: "폼 필드 메타데이터 추출"
+    input: { PDF파일경로 }
+    output: { 필드메타데이터JSON }
+
+  - name: pdf_extract_structure
+    description: "텍스트/라벨/좌표 추출"
+    input: { PDF파일경로 }
+    output: { 구조정보JSON }
+
+  - name: pdf_fill_fields
+    description: "채울 수 있는 필드 작성 (필드 방식)"
+    input: { 입력PDF, 출력PDF, 필드데이터JSON }
+    output: { 처리된파일경로 }
+
+  - name: pdf_fill_annotations
+    description: "주석 오버레이 방식 폼 작성"
+    input: { 입력PDF, 출력PDF, 주석데이터JSON }
+    output: { 처리된파일경로 }
+
+  - name: pdf_check_boxes
+    description: "바운딩 박스 검증"
+    input: { PDF파일경로, 좌표데이터JSON }
+    output: { 검증결과, 오차목록 }
+
+  - name: pdf_to_images
+    description: "PDF → PNG 변환"
+    input: { 입력PDF, 출력디렉토리 }
+    output: { 이미지파일목록 }
+
+  - name: pdf_validation_image
+    description: "검증 이미지 생성"
+    input: { 입력PDF, 출력이미지경로 }
+    output: { 생성된이미지경로 }
