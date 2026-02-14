@@ -2,6 +2,8 @@
   "name": "claude-skills",
   "version": "1.0.0",
   "description": "Anthropic Claude Code 공식 스킬 6종(DOCX, PPTX, XLSX, PDF, Frontend Design, Product Self-Knowledge)과 도구를 DMAP 플러그인으로 통합 제공",
-  "author": "Unicorn Inc.",
+  "author": {
+    "name": "Unicorn Inc."
+  },
   "license": "MIT"
 }
