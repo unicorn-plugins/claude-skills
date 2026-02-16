@@ -1,6 +1,7 @@
 ---
 name: product-self-knowledge
 description: Anthropic 제품 지식 — Claude Code, Claude API, Claude.ai 관련 정확한 정보 제공
+type: orchestrator
 ---
 
 # Anthropic 제품 지식

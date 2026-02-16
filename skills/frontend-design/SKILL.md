@@ -1,6 +1,7 @@
 ---
 name: frontend-design
 description: 프론트엔드 디자인 가이드 — 탁월한 심미성과 독창성을 갖춘 웹 인터페이스 생성
+type: orchestrator
 ---
 
 # 프론트엔드 디자인

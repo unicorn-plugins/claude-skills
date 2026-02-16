@@ -2,6 +2,7 @@
 name: setup
 description: 플러그인 환경 설정 마법사
 user-invocable: true
+type: setup
 ---
 
 # Setup

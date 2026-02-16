@@ -2,6 +2,7 @@
 name: remove-ext-skill
 description: 확장 스킬 제거
 user-invocable: true
+type: utility
 ---
 
 # Remove External Skill

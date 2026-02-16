@@ -2,6 +2,7 @@
 name: add-ext-skill
 description: 확장 스킬 추가 (외부 SKILL.md 동적 로드)
 user-invocable: true
+type: utility
 ---
 
 # Add External Skill

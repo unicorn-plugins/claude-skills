@@ -1,6 +1,7 @@
 ---
 name: core
 description: 사용자 요청 의도 판별 및 스킬 라우팅
+type: core
 ---
 
 # Core

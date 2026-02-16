@@ -1,6 +1,7 @@
 ---
 name: pdf
 description: PDF 처리 스킬 — 읽기, 생성, 편집, 폼 작성, 변환
+type: orchestrator
 ---
 
 # PDF 처리
